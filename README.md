@@ -1,2 +1,2 @@
 # no-mas-pan
-Contá tus calorías y dejá de hacerle ojitos al pan.
+Si no bajas de peso ya sabes porque

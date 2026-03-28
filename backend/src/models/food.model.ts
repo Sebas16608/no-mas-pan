@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database";
+import User from "./user.model";
 
 class Food extends Model{
     declare id?: number;
@@ -43,7 +44,7 @@ Food.init({
     userId: {
         type: DataTypes.INTEGER,
         references: {
-            model: "User",
+            model: User,
             key: "id",
         },
         onDelete: "CASCADE",

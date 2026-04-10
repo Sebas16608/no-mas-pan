@@ -77,3 +77,5 @@ MealItem.init({
     }
   }
 });
+
+export default MealItem;

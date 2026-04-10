@@ -1,4 +1,6 @@
 import app from "./app";
+import "./models/association";
+
 const port = 3000;
 
 async function main() {

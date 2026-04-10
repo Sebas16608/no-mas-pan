@@ -46,3 +46,5 @@ FavoriteFood.init({
         }
     ]
 })
+
+export default FavoriteFood;

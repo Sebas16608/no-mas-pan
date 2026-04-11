@@ -1,7 +1,7 @@
 import User from "./user/user.model";
 import Food from "./food/food.model";
 import Meal from "./meal/meal.model";
-import MealItem from "./mealitem/mealitem";
+import MealItem from "./mealitem/mealitem.model";
 import Progress from "./progress/progress.model";
 import FavoriteFood from "./favoriteFood/favoriteFood.model";
 

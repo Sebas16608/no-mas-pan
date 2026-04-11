@@ -1,20 +1,27 @@
 import sequelize from "../config/database";
-import User from "./user.model";
 import { DataTypes, Model } from "sequelize";
+import User from "../user/user.model";
 
-class Progress extends Model {
-    declare id?: number;
-    declare userId: number;
-    declare date: Date;
-    declare weight: number | null;
-    declare body_fat: number | null;
+export enum MealType {
+  BREAKFAST = "BREAKFAST",
+  LUNCH = "LUNCH",
+  DINNER = "DINNER",
+  SNACK = "SNACK",
 }
 
-Progress.init({
+class Meal extends Model {
+    declare id?: number;
+    declare userId: number;
+    declare type: MealType;
+    declare date: string;
+    declare total_calories: number;
+}
+
+Meal.init({
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
-        primaryKey: true
+        primaryKey: true,
     },
     userId: {
         type: DataTypes.INTEGER,
@@ -26,35 +33,31 @@ Progress.init({
         onDelete: "CASCADE",
         onUpdate: "CASCADE",
     },
+    type: {
+        type: DataTypes.ENUM(...Object.values(MealType)),
+        allowNull: false,
+    },
     date: {
         type: DataTypes.DATEONLY,
         allowNull: false,
     },
-    weight: {
-        type: DataTypes.DECIMAL(5, 2),
-        allowNull: true,
-        validate: {
-            min: 0
-        }
+    total_calories: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
     },
-    body_fat: {
-        type: DataTypes.DECIMAL(5, 2),
-        allowNull: true,
-        validate: {
-            min: 0,
-            max: 100
-        }
-    },
-},{
+},
+{
     sequelize,
-    modelName: "Progress",
+    modelName: "Meal",
     freezeTableName: true,
+    timestamps: true,
     indexes: [
         {
             unique: true,
-            fields: ["userId", "date"]
+            fields: ["userId", "date", "type"]
         }
     ]
-})
+});
 
-export default Progress;
+export default Meal;

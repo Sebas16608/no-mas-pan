@@ -1,6 +1,6 @@
 import sequelize from "../config/database";
-import User from "./user.model";
-import Food from "./food.model";
+import User from "../user/user.model";
+import Food from "../food/food.model";
 import { DataTypes, Model } from "sequelize";
 
 class FavoriteFood extends Model {

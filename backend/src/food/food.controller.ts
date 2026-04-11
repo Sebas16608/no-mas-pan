@@ -1,4 +1,4 @@
-import Food from "../models/food.model";
+import Food from "./food.model";
 import { Request, Response } from "express";
 
 class FoodController {

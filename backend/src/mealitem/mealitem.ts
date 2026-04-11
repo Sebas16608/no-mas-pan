@@ -1,7 +1,7 @@
 import sequelize from "../config/database";
 import { DataTypes, Model } from "sequelize";
-import Meal from "./meal.model";
-import Food from "./food.model";
+import Meal from "../meal/meal.model";
+import Food from "../food/food.model";
 
 class MealItem extends Model {
     declare id?: number;

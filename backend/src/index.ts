@@ -1,5 +1,5 @@
 import app from "./app";
-import "./models/association";
+import "./association";
 import sequelize from "./config/database";
 
 const port = 3000;

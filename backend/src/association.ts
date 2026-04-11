@@ -1,9 +1,9 @@
-import User from "./user.model";
-import Food from "./food.model";
-import Meal from "./meal.model";
-import MealItem from "./mealitem";
-import Progress from "./progress.model";
-import FavoriteFood from "./favoriteFood.model";
+import User from "./user/user.model";
+import Food from "./food/food.model";
+import Meal from "./meal/meal.model";
+import MealItem from "./mealitem/mealitem";
+import Progress from "./progress/progress.model";
+import FavoriteFood from "./favoriteFood/favoriteFood.model";
 
 // 🔹 User ↔ Meal
 User.hasMany(Meal, { foreignKey: "userId", as: "meals" });

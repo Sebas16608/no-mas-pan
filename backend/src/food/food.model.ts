@@ -6,9 +6,9 @@ class Food extends Model{
     declare id?: number;
     declare name: string;
     declare calories: number;
-    declare protein: number;
-    declare carbs: number;
-    declare fats: number;
+    declare protein?: number;
+    declare carbs?: number;
+    declare fats?: number;
     declare userId: number;
 }
 
@@ -26,19 +26,19 @@ Food.init({
         }
     },
     calories: {
-        type: DataTypes.DECIMAL(5, 2),
+        type: DataTypes.INTEGER(),
         allowNull: false,
     },
     protein: {
-        type: DataTypes.DECIMAL(5, 2),
+        type: DataTypes.INTEGER(),
         allowNull: true
     },
     carbs: {
-        type: DataTypes.DECIMAL(5, 2),
+        type: DataTypes.INTEGER(),
         allowNull: true
     },
     fats: {
-        type: DataTypes.DECIMAL(5, 2),
+        type: DataTypes.INTEGER(),
         allowNull: true
     },
     userId: {

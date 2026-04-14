@@ -1,5 +1,7 @@
 import Food from "./food.model";
 import { Request, Response } from "express";
+import { FoodSchema } from "./food.schema";
+import { da } from "zod/locales";
 
 class FoodController {
     async getAllFood (req: Request, res: Response) {
@@ -14,9 +16,11 @@ class FoodController {
 
     async post (req: Request, res: Response) {
         try {
-            const { name, calories, protein, carbs, fats, userId } = req.body;
+            const result = FoodSchema.safeParse(req.body)
+
+            if (!result.success) return res.status(400).json({ error: "invalid data" });
     
-            const food = await Food.create({ name, calories, protein, carbs, fats, userId });
+            const food = result;
 
             return res.status(201).json(food);
         } catch (error) {
@@ -35,14 +39,11 @@ class FoodController {
 
             if (!food) return res.status(404).json({ error: "Not Found" });
 
-            const { name, calories, protein, carbs, fats, userId } = req.body;
+            const result = FoodSchema.partial().safeParse(req.body)
 
-            food.name = name ?? food.name;
-            food.calories = calories ?? food.calories;
-            food.protein = protein ?? food.protein;
-            food.carbs = carbs ?? food.carbs;
-            food.fats = fats ?? food.fats;
-            food.userId = userId ?? food.userId;
+            if (!result.success) return res.status(400).json({ error: "invalid data" });
+
+            Object.assign(food, result.data);
 
             await food.save();
 

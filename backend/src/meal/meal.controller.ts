@@ -1,5 +1,6 @@
 import Meal from "./meal.model";
 import { Request, Response } from "express";
+import { MealSchema } from "./meal.schema";
 
 class MealController {
     async getByDate (req: Request, res: Response) {
@@ -19,9 +20,13 @@ class MealController {
 
     async post (req: Request, res: Response) {
         try {
-            const { userId, type, date, total_calories } = req.body;
-    
-            const meal = await Meal.create({ userId, type, date, total_calories });
+            const result = MealSchema.safeParse(req.body);
+
+            if (!result.success) return res.status(400).json({ error: "invalid data" });
+            
+            const meal = await Meal.create(result.data);
+
+            console.log("meal creada");
     
             return res.status(201).json(meal);        
         } catch (error) {

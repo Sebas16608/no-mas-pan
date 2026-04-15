@@ -1,6 +1,7 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database";
 import User from "../user/user.model";
+import { tr } from "zod/locales";
 
 class Food extends Model{
     declare id?: number;
@@ -9,7 +10,7 @@ class Food extends Model{
     declare protein?: number;
     declare carbs?: number;
     declare fats?: number;
-    declare userId: number;
+    declare userId?: number;
 }
 
 Food.init({
@@ -53,7 +54,8 @@ Food.init({
 }, {
     sequelize,
     modelName: "Food",
-    freezeTableName: true
+    freezeTableName: true,
+    timestamps: true,
 });
 
 export default Food;

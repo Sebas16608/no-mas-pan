@@ -9,7 +9,7 @@ async function main() {
         await sequelize.authenticate();
         console.log("DB establecida");
 
-        await sequelize.sync({ alter: true });
+        await sequelize.sync();
         console.log("DB sincronizada");
 
         app.listen(port, () => {

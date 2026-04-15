@@ -1,13 +1,12 @@
 import Food from "./food.model";
 import { Request, Response } from "express";
 import { FoodSchema } from "./food.schema";
-import { da } from "zod/locales";
+import { Op } from "sequelize";
 
 class FoodController {
     async getAllFood (req: Request, res: Response) {
         try {
             const food = await Food.findAll();
-
             return res.status(200).json(food)
         } catch (error) {
             return res.status(500).json({ error: "Internal Error Server" });
@@ -36,8 +35,8 @@ class FoodController {
             const result = FoodSchema.safeParse(req.body)
 
             if (!result.success) return res.status(400).json({ error: "invalid data" });
-    
-            const food = result;
+
+            const food = await Food.create(result.data);
 
             return res.status(201).json(food);
         } catch (error) {
@@ -66,7 +65,6 @@ class FoodController {
 
             return res.json(food);
         } catch (error) {
-            console.error(error);
             return res.status(400).json({ error: "Bad Request" });
         }
     }
@@ -86,7 +84,6 @@ class FoodController {
     
             return res.status(204).send();
         } catch (error) {
-            console.error(error);
             return res.status(500).json({ error: "internal error" });
         }
     }

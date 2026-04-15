@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from "express";
 import morgan from "morgan";
 import cors from "cors";
+import FoodRouter from "./food/food.router";
 
 const app = express();
 
@@ -13,7 +14,10 @@ app.use(express.json());
 app.get("/", (req: Request, res: Response) => {
     res.status(200).json({
         message: "Welcome",
+        endpoints: "/food",
     })
 })
+
+app.use("/food", FoodRouter);
 
 export default app;

@@ -36,6 +36,7 @@ Meal.init({
     type: {
         type: DataTypes.ENUM(...Object.values(MealType)),
         allowNull: false,
+        defaultValue: MealType.BREAKFAST,
     },
     date: {
         type: DataTypes.DATEONLY,

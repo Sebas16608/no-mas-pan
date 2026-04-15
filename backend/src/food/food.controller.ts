@@ -14,6 +14,23 @@ class FoodController {
         }
     }
 
+    async getFoodById (req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+            const foodId = Number(id);
+
+            if (isNaN(foodId)) return res.status(400).json({ error: "Invalid Id" });
+
+            const food = await Food.findByPk(foodId);
+
+            if (!food) return res.status(404).json({ error: "not found" });
+
+            return res.status(200).json(food);
+        } catch (error) {
+            return res.status(500).json({ error: "internal error" });
+        }
+    }
+
     async post (req: Request, res: Response) {
         try {
             const result = FoodSchema.safeParse(req.body)

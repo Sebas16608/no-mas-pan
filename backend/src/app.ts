@@ -3,6 +3,9 @@ import morgan from "morgan";
 import cors from "cors";
 import FoodRouter from "./food/food.router";
 import MealRouter from "./meal/meal.router";
+import UserRouter from "./user/user.router";
+import LoginRouter from "./user/routers/login.router";
+import RegisterRouter from "./user/routers/register.router";
 
 const app = express();
 
@@ -17,12 +20,17 @@ app.get("/", (req: Request, res: Response) => {
         message: "Welcome",
         endpoints: {
             food: "/food",
-            meal: "/meal"
+            meal: "/meal",
+            auth: "/auth",
+            user: "/user",
         }
     })
 })
 
 app.use("/food", FoodRouter);
 app.use("/meal", MealRouter);
+app.use("/auth/login", LoginRouter);
+app.use("/auth/register", RegisterRouter);
+app.use("/user", UserRouter);
 
 export default app;

@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { RegisterSchema } from "../user.schema";
 import { generateToken } from "../../utils/jwt";
 import User from "../user.model";
-import bcrypt from "bcrypt";
 
 class RegisterController {
     async register (req: Request, res: Response) {
@@ -11,20 +10,25 @@ class RegisterController {
             if (!result.success)  return res.status(400).json({ error: "invalid data" });
 
             const email = result.data.email;
-            const password = result.data.password;
+
+            const data = result.data;
 
             const userExist = await User.findOne({ where: { email }});
 
             if (userExist) return res.status(400).json({ error: "that user already exist" });
 
-            const user = await User.create({ email, password });
+            const user = await User.create(data);
 
             const token = generateToken({
                 id: user.id,
-                email: user.email,
-            })
+                email: user.email,  
+            });
+
+            return res.status(201).json({ user: token });
         } catch (error) {
             return res.status(400).json({ error: "bad request" });
         }
     }
 }
+
+export default new RegisterController;

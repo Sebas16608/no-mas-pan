@@ -20,3 +20,4 @@ coverage/
 .cache/
 .sqlite3
 *.sqlite3
+TICKETS.md

@@ -1,14 +1,30 @@
-import { Request, Response, NextFunction } from "express";
+import { Request } from "express";
+import { validationResult, body } from "express-validator";
 
-const isEmpty = (value: any) => {
-    return typeof value !== "string" || value.trim() === "";
-}
+export const userValidationRules = [
+  body("username")
+    .trim()
+    .notEmpty()
+    .withMessage("El nombre de username es obligatorio")
+    .isLength({ min: 3 })
+    .withMessage("Debe tener al menos 3 caracteres"),
 
-export function validateUser (req: Request, res: Response, next: NextFunction) {
-    const { username, email, password, objective, weight, height } = req.body;
-    const errors: any = {}
+  body("email")
+    .isEmail()
+    .withMessage("Debe ser un correo electronico valido")
+    .normalizeEmail(),
 
-    if (typeof username !== "string" || username.trim().length < 3) {
-        errors.username = "El username tiene que ser mayor a 3 digitos"
-    }
-}
+  body("password")
+    .isLength({ min: 6 })
+    .withMessage("La contraseña debe tener al menos 6 caracteres"),
+
+  body("objective").trim().notEmpty().withMessage("El objetivo es obligatorio"),
+
+  body("weight")
+    .isFloat({ min: 1 })
+    .withMessage("El peso debe ser un número válido mayor a 0"),
+
+  body("height")
+    .isFloat({ min: 1 })
+    .withMessage("La altura debe ser un número válido mayor a 0"),
+];

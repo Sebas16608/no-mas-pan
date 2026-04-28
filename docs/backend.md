@@ -4,38 +4,53 @@ API REST para aplicación de seguimiento nutricional y control de peso.
 
 ## Stack Tecnológico
 
-- **Runtime**: Node.js
+- **Runtime**: Node.js + TypeScript
 - **Framework**: Express.js
 - **ORM**: Sequelize
 - **Base de datos**: SQLite
-- **Autenticación**: bcrypt (hash de contraseñas)
+- **Validación**: Zod
+- **Autenticación**: bcrypt (hash) + JWT
 
 ## Estructura del Proyecto
 
 ```
 backend/src/
-├── app.ts              # Configuración principal de Express
-├── index.ts            # Punto de entrada, inicia servidor y sincroniza BD
-├── association.ts      # Definición de relaciones entre modelos
+├── app.ts                  # Configuración principal de Express
+├── index.ts                # Punto de entrada, inicia servidor y sincroniza BD
+├── association.ts          # Definición de relaciones entre modelos
 ├── config/
-│   └── database.ts     # Configuración de Sequelize (SQLite)
-├── middleware/
-│   └── validation.ts   # Middleware de validación (pendiente)
+│   └── database.ts         # Configuración de Sequelize (SQLite)
+├── food/
+│   ├── food.controller.ts  # Controlador de alimentos
+│   ├── food.model.ts       # Modelo de alimentos
+│   ├── food.router.ts      # Rutas de alimentos
+│   └── food.schema.ts      # Schema de validación Zod
 ├── meal/
 │   ├── meal.controller.ts  # Controlador de comidas
-│   └── meal.model.ts      # Modelo de comida
+│   ├── meal.model.ts       # Modelo de comida
+│   ├── meal.router.ts      # Rutas de comidas
+│   └── meal.schema.ts      # Schema de validación Zod
 ├── mealitem/
-│   └── mealitem.model.ts  # Modelo de ítems de comida
-├── food/
-│   ├── food.controller.ts # Controlador de alimentos
-│   └── food.model.ts      # Modelo de alimentos
+│   └── mealitem.model.ts   # Modelo de ítems de comida
 ├── user/
-│   └── user.model.ts      # Modelo de usuario
+│   ├── controllers/
+│   │   ├── login.controller.ts    # Controlador de login
+│   │   └── register.controller.ts # Controlador de registro
+│   ├── routers/
+│   │   ├── login.router.ts        # Ruta de login
+│   │   └── register.router.ts     # Ruta de registro
+│   ├── user.controller.ts         # Controlador de usuario
+│   ├── user.model.ts              # Modelo de usuario
+│   ├── user.router.ts             # Rutas de usuario
+│   └── user.schema.ts             # Schemas de validación Zod
 ├── progress/
-│   └── progress.model.ts  # Modelo de progreso corporal
+│   └── progress.model.ts          # Modelo de progreso corporal
 ├── favoriteFood/
-│   └── favoriteFood.model.ts # Tabla pivote favoritos
-└── types/                # Definiciones de tipos TypeScript
+│   └── favoriteFood.model.ts      # Tabla pivote favoritos
+├── middleware/
+│   └── validation.ts              # Middleware de validación
+├── types/                         # Definiciones de tipos TypeScript
+└── utils/                         # Utilidades
 ```
 
 ## Modelos
@@ -147,29 +162,81 @@ Meal 1───< MealItem (hasMany/belongsTo)
 Food 1───< MealItem (hasMany/belongsTo)
 ```
 
-## Controladores
+## Endpoints
 
-### MealController
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| getByDate | GET /meal/:date | Obtiene comidas por fecha |
-| post | POST /meal | Crea una nueva comida |
-| delete | DELETE /meal/:id | Elimina una comida |
-
-### FoodController
+### Autenticación
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| getAllFood | GET /food | Obtiene todos los alimentos |
-| post | POST /food | Crea un nuevo alimento |
-| put | PUT /food/:id | Actualiza un alimento |
-| delete | DELETE /food/:id | Elimina un alimento |
+| POST | `/auth/register` | Registro de nuevo usuario |
+| POST | `/auth/login` | Inicio de sesión |
 
-## Middleware
+### Alimentos
 
-### validation.ts
-Middleware de validación (en desarrollo).
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/food` | Listar todos los alimentos |
+| GET | `/food/:id` | Obtener alimento por ID |
+| POST | `/food` | Crear nuevo alimento |
+| PATCH | `/food/:id` | Actualizar alimento |
+| DELETE | `/food/:id` | Eliminar alimento |
+
+### Comidas
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/meal/:date` | Obtener comidas por fecha |
+| POST | `/meal` | Crear nueva comida |
+| DELETE | `/meal/:id` | Eliminar comida |
+
+### Usuario
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/user` | Obtener perfil del usuario |
+| PATCH | `/user` | Actualizar perfil |
+
+## Validación con Zod
+
+### RegisterSchema
+```typescript
+{
+    username: z.string().min(3),
+    email: z.email(),
+    password: z.string().min(8),
+    objective: z.enum(['CUT', 'BULK', 'MAINTAIN']),
+    weight: z.number(),
+    height: z.number()
+}
+```
+
+### LoginSchema
+```typescript
+{
+    email: z.email(),
+    password: z.string().min(8)
+}
+```
+
+### FoodSchema
+```typescript
+{
+    name: z.string().min(5),
+    calories: z.number().positive().min(3),
+    protein: z.number().positive().min(3).optional(),
+    carbs: z.number().positive().min(3).optional(),
+    fats: z.number().positive().min(3).optional()
+}
+```
+
+### MealSchema
+```typescript
+{
+    type: z.enum(['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK']),
+    date: z.date(),
+    total_calories: z.number().min(3)
+}
+```
 
 ## Configuración
 
@@ -184,11 +251,19 @@ Middleware de validación (en desarrollo).
 - **JSON**: Habilitado
 - **Logging**: Morgan (dev)
 
+### Variables de Entorno
+```
+PORT=3000
+DB_STORAGE=src/config/db.sqlite3
+JWT_SECRET=your-secret-key
+```
+
 ## Inicio del Servidor
 
 ```bash
 cd backend
-npm start
+npm install
+npm run dev
 ```
 
 El servidor:
@@ -204,14 +279,24 @@ El servidor:
 | 201 | Created - Recurso creado |
 | 204 | No Content - Eliminación exitosa |
 | 400 | Bad Request - Datos inválidos |
+| 401 | Unauthorized - No autenticado |
 | 404 | Not Found - Recurso no encontrado |
 | 500 | Internal Server Error - Error del servidor |
 
+## Scripts Disponibles
+
+```bash
+npm run dev      # Desarrollo con ts-node-dev
+npm run build    # Compilar TypeScript
+npm start        # Iniciar producción
+npm run lint     # Verificar código con ESLint
+npm run format   # Formatear código con Prettier
+```
+
 ## Próximos Pasos
 
-- [ ] Implementar rutas (routes) para controladores
-- [ ] Agregar autenticación JWT
-- [ ] Completar middleware de validación
-- [ ] Agregar endpoints para Progress y FavoriteFood
-- [ ] Implementar control de errores centralizado
-- [ ] Agregar tests unitarios
+- [ ] Router/Controller para Progress
+- [ ] Router/Controller para FavoriteFood
+- [ ] Proteger rutas con middleware de autenticación
+- [ ] Control de errores centralizado
+- [ ] Tests unitarios

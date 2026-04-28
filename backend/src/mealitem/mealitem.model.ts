@@ -8,7 +8,10 @@ class MealItem extends Model {
     declare mealId: number;
     declare foodId: number;
     declare quantity: number;
-    declare calories_calculated: number;
+    declare calories: number;
+    declare protein: number;
+    declare carbs: number;
+    declare fats: number;
 }
 
 MealItem.init({
@@ -44,9 +47,21 @@ MealItem.init({
             min: 0.01
         }
     },
-    calories_calculated: {
+    calories: {
         type: DataTypes.INTEGER,
         allowNull: false,
+    },
+    protein: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+    carbs: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+    fats: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
     }
 }, {
   sequelize,
@@ -58,21 +73,23 @@ MealItem.init({
 
         if (!food) throw new Error("Food not found");
 
-        item.calories_calculated = Number(food.calories) * Number(item.quantity) / 100;
-        item.calories_calculated = Number(food.protein) * Number(item.quantity) / 100;
-        item.calories_calculated = Number(food.carbs) * Number(item.quantity) / 100;
-        item.calories_calculated = Number(food.fats) * Number(item.quantity) / 100;
+        const factor = Number(item.quantity) / 100;
+        item.calories = Math.round(Number(food.calories) * factor);
+        item.protein = Math.round(Number(food.protein) * factor);
+        item.carbs = Math.round(Number(food.carbs) * factor);
+        item.fats = Math.round(Number(food.fats) * factor);
     },
     beforeUpdate: async (item: MealItem) => {
         if (item.changed("quantity") || item.changed("foodId")) {
             const food = await Food.findByPk(item.foodId);
 
-            if (!food) throw new Error("Food not fuond");
+            if (!food) throw new Error("Food not found");
 
-            item.calories_calculated = Number(food.calories) * Number(item.quantity) / 100;
-            item.calories_calculated = Number(food.protein) * Number(item.quantity) / 100;
-            item.calories_calculated = Number(food.carbs) * Number(item.quantity) / 100;
-            item.calories_calculated = Number(food.fats) * Number(item.quantity) / 100;
+            const factor = Number(item.quantity) / 100;
+            item.calories = Math.round(Number(food.calories) * factor);
+            item.protein = Math.round(Number(food.protein) * factor);
+            item.carbs = Math.round(Number(food.carbs) * factor);
+            item.fats = Math.round(Number(food.fats) * factor);
         }
     }
   }

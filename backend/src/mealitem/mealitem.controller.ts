@@ -1,64 +1,87 @@
-import { number } from "zod";
 import MealItem from "./mealitem.model";
 import { Request, Response } from "express";
-import { time } from "node:console";
+import { z } from "zod";
+
+const MealItemSchema = z.object({
+    mealId: z.number().positive(),
+    foodId: z.number().positive(),
+    quantity: z.number().positive(),
+});
 
 class MealItemController {
-    async post (req: Request, res: Response) {
+    async post(req: Request, res: Response) {
         try {
-            const { mealId, foodId, quantity, calories_calculated } = req.body;
+            const result = MealItemSchema.safeParse(req.body);
 
-            const item = await MealItem.create({ mealId, foodId, quantity, calories_calculated })
+            if (!result.success) {
+                return res.status(400).json({
+                    error: "Invalid data",
+                    details: result.error.issues
+                });
+            }
+
+            const { mealId, foodId, quantity } = result.data;
+
+            const item = await MealItem.create({ mealId, foodId, quantity });
 
             return res.status(201).json(item);
         } catch (error) {
             console.error(error);
-            return res.status(400).json({ error: "bad request" });
+            return res.status(400).json({ error: "Bad request" });
         }
     }
 
-    async put (req: Request, res: Response) {
+    async put(req: Request, res: Response) {
         try {
             const { id } = req.params;
             const itemId = Number(id);
-    
-            if (isNaN(itemId)) return res.status(400).json({ error: "Invalid Id" });
-    
+
+            if (isNaN(itemId)) {
+                return res.status(400).json({ error: "Invalid ID" });
+            }
+
             const item = await MealItem.findByPk(itemId);
-            if (!item) return res.status(404).json({ error: "not found" });
-    
-            const { mealId, foodId, quantity, calories_calculated } = req.body;
-    
-            item.mealId = mealId ?? item.mealId;
-            item.foodId = foodId ?? item.foodId;
-            item.quantity = quantity ?? item.quantity;
-            item.calories_calculated = calories_calculated ?? item.calories_calculated;
-    
+            if (!item) {
+                return res.status(404).json({ error: "Not found" });
+            }
+
+            const { mealId, foodId, quantity } = req.body;
+
+            if (mealId) item.mealId = mealId;
+            if (foodId) item.foodId = foodId;
+            if (quantity) item.quantity = quantity;
+
             await item.save();
-    
-            res.json(item);
+
+            return res.json(item);
         } catch (error) {
             console.error(error);
-            return res.status(400).json({ error: "bad request" });
+            return res.status(400).json({ error: "Bad request" });
         }
     }
 
-    async delete (req: Request, res: Response) {
+    async delete(req: Request, res: Response) {
         try {
             const { id } = req.params;
             const itemId = Number(id);
-    
-            if (isNaN(itemId)) return res.status(400).json({ error: "invalid id" });
-    
+
+            if (isNaN(itemId)) {
+                return res.status(400).json({ error: "Invalid ID" });
+            }
+
             const item = await MealItem.findByPk(itemId);
-    
-            if (!item) return res.status(404).json({ error: "not found" });
-    
+
+            if (!item) {
+                return res.status(404).json({ error: "Not found" });
+            }
+
             await item.destroy();
             return res.status(204).send();
         } catch (error) {
             console.error(error);
-            return res.status(500).json({ error: "internal error" });
+            return res.status(500).json({ error: "Internal error" });
         }
     }
 }
+
+export default new MealItemController();

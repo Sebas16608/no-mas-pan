@@ -1,9 +1,10 @@
 import userController from "./controllers/user.controller";
 import { Router } from "express";
+import { authenticateToken } from "../middleware/auth";
 
 const router = Router();
 
-router.get("/", (req, res) => userController.getAllUsers(req, res));
-router.get("/:id", (req, res) => userController.getUserById(req, res));
+router.get("/", authenticateToken, (req, res) => userController.getUser(req, res));
+router.patch("/", authenticateToken, (req, res) => userController.updateUser(req, res));
 
 export default router;
